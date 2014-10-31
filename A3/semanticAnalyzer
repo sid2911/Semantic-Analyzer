@@ -1,0 +1,70 @@
+package A3;
+
+import java.util.Hashtable;
+import java.util.Stack;
+import java.util.Vector;
+
+public class SemanticAnalyzer {
+  
+  private static final Hashtable<String, Vector<SymbolTableItem>> symbolTable = new Hashtable<String, Vector<SymbolTableItem>>();
+  private static final Stack stack = new Stack();
+  
+  // create here a data structure for the cube of types
+  
+  public static Hashtable<String, Vector<SymbolTableItem>> getSymbolTable() {
+    return symbolTable;
+  }
+  
+  public static void checkVariable(String type, String id) {
+   
+   
+    // A. search the id in the symbol table
+
+    // B. if !exist then insert: type, scope=global, value={0, false, "", '')
+    Vector v = new Vector();
+    v.add(new SymbolTableItem(type,"global", ""));
+    symbolTable.put(id, v);
+
+    // C. else error: “variable id is already defined”
+  }
+
+  public static void pushStack(String type) {
+  
+    // push type in the stack
+  }
+  
+  public static String popStack() {
+    String result="";
+    // pop a value from the stack
+    return result;
+  }
+  
+  
+  private String calculateCube(String type, String operator) {
+    String result="";
+    // unary operator ( - and !)
+    return result;
+  }
+
+  private String calculateCube(String type1, String type2, String operator) {
+    String result="";
+    // binary operator ( - and !)
+    return result;
+  }
+  
+  private static void error(Gui gui, int err, int n) {
+    switch (err) {
+      case 1: 
+        gui.writeConsole("Line" + n + ": variable id is already defined"); 
+        break;
+      case 2: 
+        gui.writeConsole("Line" + n + ": incompatible types: type mismatch"); 
+        break;
+      case 3: 
+        gui.writeConsole("Line" + n + ": incompatible types: expected boolean"); 
+        break;
+
+    }
+  }
+  
+}
