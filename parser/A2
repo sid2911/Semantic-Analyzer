@@ -12,10 +12,10 @@ import A3.SemanticAnalyzer;
  */
 public class Parser {
 
-  private static DefaultMutableTreeNode root;
-  private static Vector<Token> tokens;
-  private static int currentToken;
-  private static Gui gui;
+  public static DefaultMutableTreeNode root;
+  public static Vector<Token> tokens;
+  public static int currentToken;
+  public static Gui gui;
 
   public static DefaultMutableTreeNode run(Vector<Token> t, Gui gui) {
     Parser.gui=gui;
@@ -175,12 +175,14 @@ public class Parser {
   
   private static boolean rule_ASSIGNMENT(DefaultMutableTreeNode parent)
   {
+	  SemanticAnalyzer sa=new SemanticAnalyzer();
   boolean error1= false; int n=0;
   DefaultMutableTreeNode node;
   node= new DefaultMutableTreeNode("IDENTIFIER("+tokens.get(currentToken).getWord()+")");
   parent.add(node);
   n = tokens.get(currentToken).getLine();
   currentToken++;
+  sa.pushStack(tokens.get(currentToken).getWord());
   if (currentToken < tokens.size() && tokens.get(currentToken).getWord().equals("=")){
   node= new DefaultMutableTreeNode("=");
   parent.add(node);
@@ -198,6 +200,14 @@ public class Parser {
       parent.add(node);
       error1 = rule_expression(node);
   }   
+  String x= sa.popStack();
+	String y= sa.popStack();
+	
+	String res= sa.calculateCube(x, y);
+	if(res.equals("OK"))
+		System.out.println("types match");
+	else
+		System.out.println("types dont match");
   return error1;
  
   }
@@ -214,7 +224,9 @@ public class Parser {
   if(tokens.get(currentToken).getToken().equals("IDENTIFIER")){
     node= new DefaultMutableTreeNode("IDENTIFIER ("+tokens.get(currentToken).getWord()+")");
   parent.add(node);
+  SemanticAnalyzer.checkVariable(tokens.get(currentToken-1).getWord(), tokens.get(currentToken).getWord());
   currentToken++;
+  
   }
   else
   {
@@ -488,26 +500,44 @@ currentToken++;
   
   private static boolean rule_E(DefaultMutableTreeNode parent) {
     boolean error1;
+    SemanticAnalyzer sa=new SemanticAnalyzer();
+   String operator=null;
+    int flag=0;
     DefaultMutableTreeNode node;
     node = new DefaultMutableTreeNode("A");
     parent.add(node);
     error1 = rule_A(node);
+    flag=1;
     while (currentToken < tokens.size() && tokens.get(currentToken).getWord().equals("+") || currentToken < tokens.size() && tokens.get(currentToken).getWord().equals("-")) {
       if (currentToken < tokens.size() && tokens.get(currentToken).getWord().equals("+")) {
         node = new DefaultMutableTreeNode("+");
+        operator="+";
         parent.add(node);
         currentToken++;
         node = new DefaultMutableTreeNode("A");
         parent.add(node);
         error1 = rule_A(node);
+        flag++;
       } else if (currentToken < tokens.size() && tokens.get(currentToken).getWord().equals("-")) {
         node = new DefaultMutableTreeNode("-");
         parent.add(node);
+       operator="-";
         currentToken++;
         node = new DefaultMutableTreeNode("A");
         parent.add(node);
         error1 = rule_A(node);
+        flag++;
       }
+    }
+    if(flag==2)
+    {
+    	String x= sa.popStack();
+    	String y= sa.popStack();
+    	
+    	String res= sa.calculateCube(x, y, operator);
+    	sa.pushStack(res);
+    	flag=0;
+    	
     }
     return error1;
   }
@@ -556,6 +586,7 @@ currentToken++;
 
   private static boolean rule_C(DefaultMutableTreeNode parent) {
     boolean error1 = false;
+    SemanticAnalyzer sa=new SemanticAnalyzer();
     DefaultMutableTreeNode node;
     if (currentToken < tokens.size() && tokens.get(currentToken).getToken().equals("INTEGER")) {
       node = new DefaultMutableTreeNode("integer" + "(" + tokens.get(currentToken).getWord() + ")");
@@ -615,10 +646,19 @@ currentToken++;
     } 
     else {
       error(9);
+      if (currentToken < tokens.size() && !tokens.get(currentToken).getToken().equals("ERROR")) {
+    	  sa.pushStack(tokens.get(currentToken).getToken());
+      }
       
     }
     return false;
   }
+  
+  public static int getLineNum()
+  {
+	  return tokens.get(currentToken).getLine();
+  }
+  
   public static void error(int err) {
   int k=0,n=0;
   if(currentToken==0 || err==4)
@@ -654,4 +694,3 @@ currentToken++;
 } 
 
 }
-
