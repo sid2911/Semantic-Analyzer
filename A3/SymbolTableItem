@@ -1,6 +1,6 @@
 package A3;
 
-class SymbolTableItem {
+public class SymbolTableItem {
 
   private String type;
   private String scope;
@@ -37,4 +37,3 @@ class SymbolTableItem {
   }
   
 }
-
