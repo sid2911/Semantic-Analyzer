@@ -9,14 +9,19 @@ import A2.Parser;
 public class SemanticAnalyzer {
 	static Gui gui;
 	Stack<String> s=new Stack<String>();
+	private static int PLUS=0;
+	private static int MINUS=0;
+	private static int MUL=0;
+	private static int DIV=0;
+	private static int EQ=3;
 	private static int Int=0;
 	private static int Float=1;
 	private static int Char=2;
-	private static int string=3;
+	private static int STRING=3;
 	private static int Boolean=4;
 	private static int Void=5;
 	private static int err=-1;
-	private static int ok=6;
+	private static int OK=6;
 	private static int cube[][][]={{{ 0, 1,-1, 3,-1,-1},
 									{ 1, 1,-1, 3,-1,-1},
 									{-1,-1,-1, 3,-1,-1},
@@ -43,7 +48,7 @@ public class SemanticAnalyzer {
 									{-1,-1,-1,-1,-1, 6}}};
   
   private static final Hashtable<String, Vector<SymbolTableItem>> symbolTable = new Hashtable<String, Vector<SymbolTableItem>>();
-  private static final Stack stack = new Stack();
+  private static final Stack<String> stack = new Stack<String>();
   
   // create here a data structure for the cube of types
   
@@ -74,10 +79,12 @@ public class SemanticAnalyzer {
     // C. else error: “variable id is already defined”
   }
 
-  public void pushStack(String type) {
+  public static void pushStack(String type) {
   
     // push type in the stack
-	 s.push(type);
+	  System.out.println("Stack Before Pushing: "+stack);
+	 stack.push(type);
+	 System.out.println("current stack" +stack);
 	  
 	  
   }
@@ -85,7 +92,8 @@ public class SemanticAnalyzer {
   public String popStack() {
     String result="";
     // pop a value from the stack
-    s.pop();
+    if(!stack.isEmpty())
+    result=stack.pop();
     return result;
   }
   
@@ -98,7 +106,54 @@ public class SemanticAnalyzer {
 
   public String calculateCube(String type1, String type2, String operator) {
     String result="";
-    // binary operator ( - and !)
+    System.out.println("type: " +type1);
+    int t1=0,t2=0,op=0;
+    if(type1.equals("INTEGER"))
+    	t1=Int;
+    else if(type1.equals("FLOAT"))
+    	t1=Float;
+    else if(type1.equals("CHARACTER"))
+    	t1=Char;
+    else if(type1.equals("STRING"))
+    	t1=STRING;
+    else if(type1.equals("BOOLEAN"))
+    	t1=Char;
+    else if(type1.equals("VOID"))
+    	t1=Void;
+   
+    	
+    	Vector v=new Vector();
+    	//
+   //type1=symbolTable.get(type1).firstElement().getType();
+    	t2=Int;
+    System.out.println("operator= "+operator);
+    if(operator.equals("+"))
+    	op=PLUS;
+    if(operator.equals("-"))
+    	op=MINUS;
+    if(operator.equals("*"))
+    	op=MUL;
+    if(operator.equals("/"))
+    	op=DIV;
+    if(operator.equals("="))
+    	op=EQ;
+  
+      // binary operator ( - and !)
+    int res=cube[op][t1][t2];
+    System.out.println("cube= "+cube[3][0][0]);
+    System.out.println("res= "+res);
+    if(res==0)
+    	result="INTEGER";
+    if(res==1)
+    	result="FLOAT";
+    if(res==3)
+    	result="STRING";
+    if(res==4)
+    	result="BOOLEAN";
+    if(res==-1)
+    	result="ERROR";
+    if(res==6)
+    	result="OK";
     return result;
   }
   
