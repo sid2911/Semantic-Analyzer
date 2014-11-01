@@ -5,6 +5,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import A3.Gui;
 import A3.SemanticAnalyzer;
+import A3.SymbolTableItem;
 
 /**
  *
@@ -180,9 +181,13 @@ public class Parser {
   DefaultMutableTreeNode node;
   node= new DefaultMutableTreeNode("IDENTIFIER("+tokens.get(currentToken).getWord()+")");
   parent.add(node);
+  String a=tokens.get(currentToken).getWord();
+ // SemanticAnalyzer.pushStack();
+  //SemanticAnalyzer.getSymbolTable().get(a).firstElement().getType();
+  SemanticAnalyzer.pushStack(SemanticAnalyzer.getSymbolTable().get(a).firstElement().getType());
   n = tokens.get(currentToken).getLine();
   currentToken++;
-  sa.pushStack(tokens.get(currentToken).getWord());
+  
   if (currentToken < tokens.size() && tokens.get(currentToken).getWord().equals("=")){
   node= new DefaultMutableTreeNode("=");
   parent.add(node);
@@ -201,9 +206,11 @@ public class Parser {
       error1 = rule_expression(node);
   }   
   String x= sa.popStack();
+  System.out.println("X= "+x);
 	String y= sa.popStack();
-	
-	String res= sa.calculateCube(x, y);
+	System.out.println("Y= "+y);
+	String opr="=";
+	String res= sa.calculateCube(x, y,opr);
 	if(res.equals("OK"))
 		System.out.println("types match");
 	else
@@ -535,7 +542,7 @@ currentToken++;
     	String y= sa.popStack();
     	
     	String res= sa.calculateCube(x, y, operator);
-    	sa.pushStack(res);
+    	SemanticAnalyzer.pushStack(res);
     	flag=0;
     	
     }
@@ -643,14 +650,18 @@ currentToken++;
       }
       else
       error(7);
-    } 
+    }
+    
     else {
       error(9);
-      if (currentToken < tokens.size() && !tokens.get(currentToken).getToken().equals("ERROR")) {
-    	  sa.pushStack(tokens.get(currentToken).getToken());
-      }
       
-    }
+      }
+    if (currentToken < tokens.size() && !tokens.get(currentToken).getToken().equals("ERROR")) {
+  	  System.out.println("token: "+tokens.get(currentToken).getWord());
+  	  SemanticAnalyzer.pushStack(tokens.get(currentToken-1).getToken());
+  } 
+      
+    
     return false;
   }
   
